@@ -4,8 +4,19 @@ POST http://localhost:3001/api/blogs
 Content-Type: application/json
 
 {
-    "title": "new new blog",
-    "author": "Huy",
-    "url": "www.gaugau.com",
-    "likes": 1
+    "title": "YoYo",
+    "author": "yoyo",
+    "url": "www.mlemlem.com"
+}
+###
+DELETE http://localhost:3001/api/blogs/649d45f0d966c29d4711e113
+###
+PUT http://localhost:3001/api/blogs/649d7380fa1703e9a2b8df3a
+Content-Type: application/json
+
+{
+    "title": "Rocky",
+    "author": "Rocky",
+    "url": "www.meomeo.com",
+    "likes": 100
 }
