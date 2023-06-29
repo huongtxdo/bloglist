@@ -26,8 +26,39 @@ test('HTTP GET to /api/blogs URL', async () => {
   expect(response.body).toHaveLength(helper.initialBlogs.length)
 })
 
-test('.toBeDefined() Check if a variable is defined', async () => {
-  expect(f)
+test('The unique identifier property is named id', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToView = blogsAtStart[0]
+
+  const resultBlog = await api
+    .get(`/api/blogs/${blogToView.id}`)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  expect(resultBlog).toBeDefined()
+})
+
+test('HTTP POST to /api/blogs URL', async () => {
+  const newBlog = {
+    title: 'A blog created for the purpose of testing HTTP POST',
+    author: 'Huong',
+    url: 'www.growl.com',
+    likes: 0,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
+
+  const titles = blogsAtEnd.map((blog) => blog.title)
+  expect(titles).toContain(
+    'A blog created for the purpose of testing HTTP POST'
+  )
 })
 
 afterAll(async () => {
