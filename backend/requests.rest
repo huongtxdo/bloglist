@@ -1,15 +1,70 @@
 GET http://localhost:3001/api/blogs
 ###
+GET http://localhost:3001/api/users
+###
 POST http://localhost:3001/api/blogs
+Content-Type: application/json
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imp1c3RraWRuZXkiLCJpZCI6IjY0YTFkN2M5ZDcyZTg3Mjg1N2I0MThiYiIsImlhdCI6MTY4ODU4NjU2M30.lkqjo7m0-vCtoBsq7rcUmKdVOEUYK7TdygD6XqP8xNA
+
+{
+    "title": "Test no authorization",
+    "author": "Bunny",
+    "url": "www.memesfsf.com"
+}
+###
+POST http://localhost:3001/api/users
 Content-Type: application/json
 
 {
-    "title": "YoYo",
-    "author": "yoyo",
-    "url": "www.mlemlem.com"
+    "username": "justkidney",
+    "name": "Huong Do",
+    "password": "secretpass"
 }
 ###
-DELETE http://localhost:3001/api/blogs/649d45f0d966c29d4711e113
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+    "name": "Huy Tran",
+    "username": "parabolaarc",
+    "password": "matkhau"
+}
+###
+POST http://localhost:3001/api/users
+Content-Type: application/json
+
+{
+    "name": "Chi 3 ",
+    "username": "Lan Huong",
+    "password": "password"
+}
+###
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+    "username": "justkidney",
+    "password": "secretpass"
+}
+###
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+    "username": "parabolaarc",
+    "password": "matkhau"
+}
+###
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+    "username": "Lan Huong",
+    "password": "password"
+}
+###
+DELETE http://localhost:3001/api/blogs/64a542bed769c53248703fd2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imp1c3RraWRuZXkiLCJpZCI6IjY0YTFkN2M5ZDcyZTg3Mjg1N2I0MThiYiIsImlhdCI6MTY4ODU1MTg0NSwiZXhwIjoxNjg4NTU1NDQ1fQ.j_wvU-pssLmc89dv1skXWMblRFdz8VLGmuiJEgnCO6s
 ###
 PUT http://localhost:3001/api/blogs/649d7380fa1703e9a2b8df3a
 Content-Type: application/json
