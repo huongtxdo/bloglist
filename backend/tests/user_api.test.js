@@ -8,7 +8,6 @@ const api = supertest(app)
 const Blog = require('../models/blog')
 const User = require('../models/user')
 const helper = require('./test_helper')
-const blog = require('../models/blog')
 
 beforeEach(async () => {
   await User.deleteMany({})
@@ -17,11 +16,20 @@ beforeEach(async () => {
   const passwordHash = await bcrypt.hash('secret', 10)
   const user = new User({ username: 'root', passwordHash })
   await user.save()
+
+  const blog = new Blog({
+    title: 'Initial blog',
+    author: 'admin',
+    url: 'www.adminFirstBlog.com',
+    likes: 10,
+  })
+  blog.user = user
+  await blog.save()
 })
 
 describe('POST', () => {
   test('POST to /api/blogs: Add new blog', async () => {
-    const blogsAtStart = await Blog.find({})
+    const blogsAtStart = await helper.blogsInDb()
 
     const newBlog = {
       title: 'Blog posted by root',
@@ -41,7 +49,7 @@ describe('POST', () => {
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
-    const blogsAtEnd = await Blog.find({})
+    const blogsAtEnd = await helper.blogsInDb()
     expect(blogsAtEnd).toHaveLength(blogsAtStart.length + 1)
 
     const titles = blogsAtEnd.map((blog) => blog.title)
@@ -126,13 +134,19 @@ describe('POST', () => {
   })
 })
 
-/*
 describe('DELETE', () => {
-  test('DELETE to /api/blogs/:id returns status code 204', async () => {
+  test('DELETE to /api/blogs/:id returns status code 204 if success', async () => {
     const blogsAtStart = await helper.blogsInDb()
     const blogToDelete = blogsAtStart[0]
 
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+    const result = await api
+      .post('/api/login')
+      .send({ username: 'root', password: 'secret' })
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${result.body.token}`)
+      .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
     expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
@@ -140,13 +154,40 @@ describe('DELETE', () => {
     const titles = blogsAtEnd.map((blog) => blog.title)
     expect(titles).not.toContain(blogToDelete.title)
   })
+
+  test('DELETE to /api/blogs/:id returns code 401 if token is wrong', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    const result = await api
+      .post('/api/login')
+      .send({ username: 'root', password: 'secret' })
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${result.body.token.replace('.', 'a')}`)
+      .expect(401)
+  })
+
+  test('DELETE to /api/blogs/:id returns code 404 if token is not provided', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToDelete = blogsAtStart[0]
+
+    const result = await api
+      .post('/api/login')
+      .send({ username: 'root', password: 'secret' })
+
+    result.body.token.replace('.', ',')
+
+    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(404)
+  })
 })
 
 describe('PUT', () => {
   test('Update to /api/blogs/:id returns status code 200 and the new blog', async () => {
     const blogsAtStart = await helper.blogsInDb()
     const blogToUpdate = blogsAtStart[0]
-    expect(blogToUpdate.likes).toBe(11)
+    expect(blogToUpdate.likes).toBe(10)
 
     const newBlog = {
       likes: 1000,
@@ -163,7 +204,6 @@ describe('PUT', () => {
     expect(updatedBlog.likes).toBe(1000)
   })
 })
-*/
 
 afterAll(async () => {
   await mongoose.connection.close()

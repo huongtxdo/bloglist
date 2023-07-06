@@ -63,10 +63,10 @@ Content-Type: application/json
     "password": "password"
 }
 ###
-DELETE http://localhost:3001/api/blogs/64a542bed769c53248703fd2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imp1c3RraWRuZXkiLCJpZCI6IjY0YTFkN2M5ZDcyZTg3Mjg1N2I0MThiYiIsImlhdCI6MTY4ODU1MTg0NSwiZXhwIjoxNjg4NTU1NDQ1fQ.j_wvU-pssLmc89dv1skXWMblRFdz8VLGmuiJEgnCO6s
+DELETE http://localhost:3001/api/blogs/64a5ca93036e290eacfeffb9
+# Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imp1c3RraWRuZXkiLCJpZCI6IjY0YTFkN2M5ZDcyZTg3Mjg1N2I0MThiYiIsImlhdCI6MTY4ODYyODc4OX0.TrW9DsVOW1psfnTz1QPWC_AtG6nSkt8cCTa1ue4vK7Y
 ###
-PUT http://localhost:3001/api/blogs/649d7380fa1703e9a2b8df3a
+PUT http://localhost:3001/api/blogs/64a5c95ff4013c48203f3122
 Content-Type: application/json
 
 {
