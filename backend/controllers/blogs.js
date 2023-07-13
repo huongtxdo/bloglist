@@ -1,5 +1,15 @@
 const blogsRouter = require('express').Router()
+const jwt = require('jsonwebtoken')
+
 const Blog = require('../models/blog')
+const User = require('../models/user')
+
+const getTokenFrom = (request) => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.startsWith('Bearer ')) {
+    return authorization.replace('Bearer ', '')
+  }
+}
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', {
@@ -17,15 +27,18 @@ blogsRouter.get('/:id', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
   const body = request.body
-  const user = request.user
 
-  if (!request.token) {
+  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+
+  if (!decodedToken) {
     response.status(401).end()
   }
 
   if (!body.title || !body.url) {
-    response.status(400).end()
+    response.status(400).json({ error: 'missingTitleOrUrl' }).end()
   }
+
+  const user = await User.findById(decodedToken.id)
 
   const blog = new Blog({
     title: body.title,
@@ -47,11 +60,14 @@ blogsRouter.delete('/:id', async (request, response) => {
   const blog = await Blog.findById(request.params.id)
 
   if (blog.user.toString() !== user.id.toString()) {
-    return response
-      .status(401)
-      .json({ error: 'Blog can only be removed by its owner' })
+    return response.status(401).json({ error: 'Unauthorized blog deletion' })
   }
   await Blog.findByIdAndRemove(request.params.id)
+  response.status(204).end()
+})
+
+blogsRouter.delete('/', async (request, response) => {
+  await Blog.deleteMany({})
   response.status(204).end()
 })
 
