@@ -3,9 +3,12 @@ import './index.css'
 
 import Blog from './components/Blog'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
+import LoginForm from './components/LoginForm'
 
 import blogService from './services/blogs'
 import loginService from './services/login'
+import NewBlogForm from './components/NewBlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -16,12 +19,12 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
-
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
+    async function fetchData() {
+      const returnedBlogs = await blogService.getAll()
+      setBlogs(returnedBlogs)
+    }
+    fetchData()
   }, [])
 
   useEffect(() => {
@@ -90,9 +93,6 @@ const App = () => {
       setUser(null)
       setUsername('')
       setPassword('')
-      setTitle('')
-      setAuthor('')
-      setUrl('')
       setMessage(`Logout successful!`)
       setTimeout(() => {
         setMessage(null)
@@ -102,79 +102,58 @@ const App = () => {
     }
   }
 
-  const addBlogForm = () => {
-    const addNewBlog = async (event) => {
-      event.preventDefault()
-
-      const blogObject = {
-        title: title,
-        author: author,
-        url: url,
+  const addNewBlog = async (blogObject) => {
+    try {
+      const savedBlog = await blogService.create(blogObject)
+      // setBlogs(blogs.concat(savedBlog))
+      setBlogs(blogs.concat({ ...savedBlog, user }))
+      setMessage(
+        `A new blog '${blogObject.title}' by ${blogObject.author} added!`
+      )
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    } catch (e) {
+      if (e.response.data.error === 'missingTitleOrUrl') {
+        setMessage('title and url required')
+        setIsErrorMessage(true)
+      } else if (e.response.status === 401) {
+        setMessage('Unauthorized')
+        setIsErrorMessage(true)
       }
-      try {
-        const savedBlog = await blogService.create(blogObject)
-
-        setBlogs(blogs.concat(savedBlog))
-        setTitle('')
-        setAuthor('')
-        setUrl('')
-        setMessage(
-          `A new blog '${blogObject.title}' by ${blogObject.author} added!`
-        )
-        setTimeout(() => {
-          setMessage(null)
-        }, 5000)
-      } catch (e) {
-        if (e.response.data.error === 'missingTitleOrUrl') {
-          setMessage('title and url required')
-          setIsErrorMessage(true)
-        }
-        setTimeout(() => {
-          setMessage(null)
-          setIsErrorMessage(false)
-        }, 5000)
-        if (e.response.status === 401) {
-          setMessage('Unauthorized')
-          setIsErrorMessage(true)
-        }
-        setTimeout(() => {
-          setMessage(null)
-          setIsErrorMessage(false)
-        }, 5000)
-      }
+      setTimeout(() => {
+        setMessage(null)
+        setIsErrorMessage(false)
+      }, 5000)
     }
-    return (
-      <form onSubmit={addNewBlog}>
-        <div>
-          title:
-          <input
-            type="text"
-            value={title}
-            name="Title"
-            onChange={({ target }) => setTitle(target.value)}
-          />
-        </div>
-        <div>
-          author:
-          <input
-            type="text"
-            value={author}
-            name="Author"
-            onChange={({ target }) => setAuthor(target.value)}
-          />
-        </div>
-        <div>
-          url:
-          <input
-            type="text"
-            value={url}
-            name="Url"
-            onChange={({ target }) => setUrl(target.value)}
-          />
-        </div>
-        <button type="submit">create</button>
-      </form>
-    )
+  }
+
+  const incrementLikes = async (blogObject) => {
+    try {
+      const updatedBlog = await blogService.update(blogObject.id, {
+        ...blogObject,
+        likes: blogObject.likes + 1,
+        user: blogObject.user.id,
+      })
+      setBlogs(
+        blogs.map((blog) =>
+          blog.id === updatedBlog.id
+            ? { ...blog, likes: updatedBlog.likes }
+            : blog
+        )
+      )
+      setMessage(`Liked ${blogObject.title}!`)
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    } catch (e) {
+      setMessage('Cannot like')
+      setIsErrorMessage(true)
+      setTimeout(() => {
+        setMessage(null)
+        setIsErrorMessage(false)
+      }, 5000)
+    }
   }
 
   const DeleteAllBlogs = () => {
@@ -182,8 +161,8 @@ const App = () => {
     const deleteAllBlogs = async (event) => {
       const response = await blogService.deleteAll()
       if (response.status === 204) setBlogs([])
-      return <button onClick={deleteAllBlogs}>delete all blogs</button>
     }
+    return <button onClick={deleteAllBlogs}>delete all blogs</button>
   }
 
   return (
@@ -198,10 +177,17 @@ const App = () => {
             {user.name} logged in
             <button onClick={handleLogout}>logout</button>
           </p>
-          {addBlogForm()}
+          <Togglable buttonLabel="create new blog">
+            <NewBlogForm createBlog={addNewBlog} />
+          </Togglable>
           {/* <DeleteAllBlogs /> */}
+
           {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
+            <Blog
+              key={blog.id}
+              blog={blog}
+              incrementLikes={() => incrementLikes(blog)}
+            />
           ))}
         </div>
       )}

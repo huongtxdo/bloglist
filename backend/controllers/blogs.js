@@ -51,7 +51,12 @@ blogsRouter.post('/', async (request, response) => {
   const savedBlog = await blog.save()
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
-
+  // The following is for changing in backend, we are doing changes in frontend in App.js
+  // await savedBlog.populate('user', {
+  //   username: 1,
+  //   name: 1,
+  //   id: 1,
+  // })
   response.status(201).json(savedBlog)
 })
 
@@ -74,13 +79,18 @@ blogsRouter.delete('/', async (request, response) => {
 blogsRouter.put('/:id', async (request, response) => {
   const blog = request.body
 
-  const returnedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
-    new: true,
-    runValidators: true,
-    context: 'query',
-  })
+  const returnedBlog = await Blog.findByIdAndUpdate(
+    request.params.id,
+    { ...blog },
+    {
+      new: true,
+      runValidators: true,
+      context: 'query',
+    }
+  )
 
   response.json(returnedBlog)
+  // response.status(200).json({ error: 'Unauthorized blog deletion' })
 })
 
 module.exports = blogsRouter

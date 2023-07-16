@@ -24,5 +24,10 @@ const deleteAll = async () => {
   return response
 }
 
+const update = async (id, blogObject) => {
+  const response = await axios.put(`${baseUrl}/${id}`, blogObject)
+  return response.data
+}
+
 // eslint-disable-next-line import/no-anonymous-default-export
-export default { setToken, getAll, create, deleteAll }
+export default { setToken, getAll, create, deleteAll, update }
