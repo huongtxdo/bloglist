@@ -38,30 +38,6 @@ const App = () => {
     }
   }, [])
 
-  // const loginForm = () => (
-  //   <form onSubmit={handleLogin}>
-  //     <div>
-  //       username
-  //       <input
-  //         type="text"
-  //         value={username}
-  //         name="Username"
-  //         onChange={({ target }) => setUsername(target.value)}
-  //       />
-  //     </div>
-  //     <div>
-  //       password
-  //       <input
-  //         type="password"
-  //         value={password}
-  //         name="Password"
-  //         onChange={({ target }) => setPassword(target.value)}
-  //       />
-  //     </div>
-  //     <button type="submit">login</button>
-  //   </form>
-  // )
-
   const handleLogin = async (event) => {
     event.preventDefault()
 
@@ -73,7 +49,7 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
-      setMessage(`Login successful!`)
+      setMessage('Login successful!')
       setTimeout(() => {
         setMessage(null)
       }, 5000)
@@ -95,7 +71,7 @@ const App = () => {
       setUser(null)
       setUsername('')
       setPassword('')
-      setMessage(`Logout successful!`)
+      setMessage('Logout successful!')
       setTimeout(() => {
         setMessage(null)
       }, 5000)
@@ -187,6 +163,7 @@ const App = () => {
   }
 
   // *** FOR TESTING ONLY!! DELETE EVERYTHING
+  /*
   const DeleteAllBlogs = () => {
     const deleteAllBlogs = async (event) => {
       const response = await blogService.deleteAll()
@@ -194,6 +171,7 @@ const App = () => {
     }
     return <button onClick={deleteAllBlogs}>delete all blogs</button>
   }
+  */
 
   return (
     <div>
