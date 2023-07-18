@@ -31,11 +31,11 @@ blogsRouter.post('/', async (request, response) => {
   const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
 
   if (!decodedToken) {
-    response.status(401).end()
+    return response.status(401).end()
   }
 
   if (!body.title || !body.url) {
-    response.status(400).json({ error: 'missingTitleOrUrl' }).end()
+    return response.status(400).json({ error: 'missingTitleOrUrl' }).end()
   }
 
   const user = await User.findById(decodedToken.id)
@@ -61,12 +61,17 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-  const user = request.user
-  const blog = await Blog.findById(request.params.id)
-
-  if (blog.user.toString() !== user.id.toString()) {
-    return response.status(401).json({ error: 'Unauthorized blog deletion' })
+  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+  if (!decodedToken) {
+    return response.status(401).end()
   }
+  const user = await User.findById(decodedToken.id)
+
+  const blog = await Blog.findById(request.params.id)
+  if (blog.user.toString() !== user.id.toString()) {
+    return response.status(401).end()
+  }
+
   await Blog.findByIdAndRemove(request.params.id)
   response.status(204).end()
 })

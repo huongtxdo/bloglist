@@ -19,6 +19,7 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
+  // initial loading of blogs
   useEffect(() => {
     async function fetchData() {
       const returnedBlogs = await blogService.getAll()
@@ -27,6 +28,7 @@ const App = () => {
     fetchData()
   }, [])
 
+  // setToken
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBloglistUser')
     if (loggedUserJSON) {
@@ -36,38 +38,38 @@ const App = () => {
     }
   }, [])
 
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-        <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password
-        <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
-  )
+  // const loginForm = () => (
+  //   <form onSubmit={handleLogin}>
+  //     <div>
+  //       username
+  //       <input
+  //         type="text"
+  //         value={username}
+  //         name="Username"
+  //         onChange={({ target }) => setUsername(target.value)}
+  //       />
+  //     </div>
+  //     <div>
+  //       password
+  //       <input
+  //         type="password"
+  //         value={password}
+  //         name="Password"
+  //         onChange={({ target }) => setPassword(target.value)}
+  //       />
+  //     </div>
+  //     <button type="submit">login</button>
+  //   </form>
+  // )
 
   const handleLogin = async (event) => {
     event.preventDefault()
 
     try {
       const user = await loginService.login({ username, password })
+      blogService.setToken(user.token)
       window.localStorage.setItem('loggedBloglistUser', JSON.stringify(user))
 
-      blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
@@ -156,8 +158,36 @@ const App = () => {
     }
   }
 
+  const deleteBlog = async (blogObject) => {
+    console.log('blogObject', blogObject)
+    if (
+      window.confirm(`Remove blog ${blogObject.title} by ${blogObject.author}`)
+    ) {
+      try {
+        await blogService.deleteOne(blogObject.id)
+        setBlogs(blogs.filter((blog) => blog.id !== blogObject.id))
+        setMessage('Blog removed')
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
+      } catch (e) {
+        console.log('e', e)
+        if (e.response.status === 401) {
+          setMessage('Unauthorized')
+        } else {
+          setMessage('Cannot delete')
+        }
+        setIsErrorMessage(true)
+        setTimeout(() => {
+          setMessage(null)
+          setIsErrorMessage(false)
+        }, 5000)
+      }
+    }
+  }
+
+  // *** FOR TESTING ONLY!! DELETE EVERYTHING
   const DeleteAllBlogs = () => {
-    // *** FOR TESTING ONLY!! DELETE EVERYTHING
     const deleteAllBlogs = async (event) => {
       const response = await blogService.deleteAll()
       if (response.status === 204) setBlogs([])
@@ -169,7 +199,15 @@ const App = () => {
     <div>
       <Notification message={message} isErrorMessage={isErrorMessage} />
 
-      {!user && loginForm()}
+      {!user && (
+        <LoginForm
+          handleSubmit={handleLogin}
+          username={username}
+          handleUsername={({ target }) => setUsername(target.value)}
+          password={password}
+          handlePassword={({ target }) => setPassword(target.value)}
+        />
+      )}
       {user && (
         <div>
           <h2>blogs</h2>
@@ -182,13 +220,17 @@ const App = () => {
           </Togglable>
           {/* <DeleteAllBlogs /> */}
 
-          {blogs.map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              incrementLikes={() => incrementLikes(blog)}
-            />
-          ))}
+          {blogs
+            .sort((a, b) => b.likes - a.likes)
+            .map((blog) => (
+              <Blog
+                key={blog.id}
+                user={user}
+                blog={blog}
+                incrementLikes={() => incrementLikes(blog)}
+                deleteThisBlog={() => deleteBlog(blog)}
+              />
+            ))}
         </div>
       )}
     </div>
