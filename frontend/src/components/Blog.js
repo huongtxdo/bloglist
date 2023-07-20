@@ -17,11 +17,11 @@ const Blog = ({ user, blog, incrementLikes, deleteThisBlog }) => {
   }
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className="blog">
       {blog.title} {blog.author}
       <button onClick={toggleVisibility}>{visible ? 'hide' : 'view'}</button>
       {visible && (
-        <div>
+        <div className="view-info">
           {blog.url} <br />
           likes {blog.likes} <button onClick={incrementLikes}>like</button>
           <br />
@@ -35,11 +35,11 @@ const Blog = ({ user, blog, incrementLikes, deleteThisBlog }) => {
   )
 }
 
-Blog.propTypes = {
-  user: PropTypes.object.isRequired,
-  blog: PropTypes.object.isRequired,
-  incrementLikes: PropTypes.func.isRequired,
-  deleteThisBlog: PropTypes.func.isRequired,
-}
+// Blog.propTypes = {
+//   user: PropTypes.object.isRequired,
+//   blog: PropTypes.object.isRequired,
+//   incrementLikes: PropTypes.func.isRequired,
+//   deleteThisBlog: PropTypes.func.isRequired,
+// }
 
 export default Blog
