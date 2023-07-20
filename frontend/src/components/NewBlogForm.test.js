@@ -7,20 +7,6 @@ import NewBlogForm from './NewBlogForm'
 /*Make a test for the new blog form. The test should check, that the form calls the event handler it received as props with the right details when a new blog is created.*/
 
 test('Adding a new blog works', async () => {
-  //   const user = {
-  //     name: 'ParabolaArc',
-  //     id: 123,
-  //   }
-  //   const blog = {
-  //     title: 'Blog 1',
-  //     author: 'Huong',
-  //     likes: 10,
-  //     url: 'www.testBlog.com',
-  //     user: {
-  //       name: 'ParabolaArc',
-  //       id: 123,
-  //     },
-  //   }
   const createBlog = jest.fn()
   render(<NewBlogForm createBlog={createBlog} />)
   const clicker = userEvent.setup()
