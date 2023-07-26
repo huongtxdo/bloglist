@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import PropTypes from 'prop-types'
 
 const Blog = ({ user, blog, incrementLikes, deleteThisBlog }) => {
   const [visible, setVisible] = useState(false)
@@ -23,7 +22,10 @@ const Blog = ({ user, blog, incrementLikes, deleteThisBlog }) => {
       {visible && (
         <div className="view-info">
           {blog.url} <br />
-          likes {blog.likes} <button onClick={incrementLikes}>like</button>
+          likes {blog.likes}
+          <button id="like-button" onClick={incrementLikes}>
+            like
+          </button>
           <br />
           {blog.user.name} <br />
           {blog.user.id === user.id && (

@@ -197,18 +197,19 @@ const App = () => {
             <NewBlogForm createBlog={addNewBlog} />
           </Togglable>
           {/* <DeleteAllBlogs /> */}
-
-          {blogs
-            .sort((a, b) => b.likes - a.likes)
-            .map((blog) => (
-              <Blog
-                key={blog.id}
-                user={user}
-                blog={blog}
-                incrementLikes={() => incrementLikes(blog)}
-                deleteThisBlog={() => deleteBlog(blog)}
-              />
-            ))}
+          <div className="blog-list">
+            {blogs
+              .sort((a, b) => b.likes - a.likes)
+              .map((blog) => (
+                <Blog
+                  key={blog.id}
+                  user={user}
+                  blog={blog}
+                  incrementLikes={() => incrementLikes(blog)}
+                  deleteThisBlog={() => deleteBlog(blog)}
+                />
+              ))}
+          </div>
         </div>
       )}
     </div>
