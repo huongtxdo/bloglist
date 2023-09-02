@@ -5,10 +5,6 @@ import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
 test('renders content', () => {
-  const user = {
-    name: 'ParabolaArc',
-    id: 123,
-  }
   const blog = {
     title: 'Blog 1',
     author: 'Huong',
@@ -84,3 +80,4 @@ test('clicking like button twice works as normal', async () => {
 
   expect(incrementLikes.mock.calls).toHaveLength(2)
 })
+

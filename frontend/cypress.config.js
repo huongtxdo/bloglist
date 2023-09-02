@@ -1,6 +1,6 @@
-const { defineConfig } = require('cypress')
+import { defineConfig } from 'cypress'
 
-module.exports = defineConfig({
+export default defineConfig({
   e2e: {
     baseUrl: 'http://localhost:3000',
   },
@@ -8,3 +8,4 @@ module.exports = defineConfig({
     BACKEND: 'http://localhost:3003/api',
   },
 })
+
